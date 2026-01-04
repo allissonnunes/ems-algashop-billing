@@ -1,3 +1,16 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: billing
+  datasource:
+    url: jdbc:h2:file:~/billing;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: false
