@@ -6,4 +6,6 @@ import java.util.UUID;
 
 public interface CreditCardRepository extends JpaRepository<CreditCard, UUID> {
 
+    boolean existsByIdAndCustomerId(UUID id, UUID customerId);
+
 }
