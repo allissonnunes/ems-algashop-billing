@@ -2,6 +2,7 @@ package com.github.allisson95.algashop.billing.domain.model.invoice;
 
 import com.github.allisson95.algashop.billing.domain.model.DomainException;
 import com.github.allisson95.algashop.billing.domain.model.IdGenerator;
+import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,22 +14,30 @@ import static java.util.Objects.requireNonNull;
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Entity
 public class PaymentSettings {
 
+    @Id
     private UUID id;
 
     private UUID creditCardId;
 
     private String gatewayCode;
 
+    @Enumerated(EnumType.STRING)
     private PaymentMethod method;
+
+    @Getter(AccessLevel.PRIVATE)
+    @Setter(AccessLevel.PACKAGE)
+    @OneToOne(mappedBy = Invoice_.PAYMENT_SETTINGS)
+    private Invoice invoice;
 
     static PaymentSettings brandNew(final PaymentMethod paymentMethod, final UUID creditCardId) {
         requireNonNull(paymentMethod, "paymentMethod cannot be null");
         if (PaymentMethod.CREDIT_CARD.equals(paymentMethod)) {
             requireNonNull(creditCardId, "creditCardId cannot be null");
         }
-        return new PaymentSettings(IdGenerator.generateTimeBasedUUID(), creditCardId, null, paymentMethod);
+        return new PaymentSettings(IdGenerator.generateTimeBasedUUID(), creditCardId, null, paymentMethod, null);
     }
 
     void assignGatewayCode(final String paymentGatewayCode) {

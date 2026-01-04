@@ -1,6 +1,8 @@
 package com.github.allisson95.algashop.billing.domain.model.creditcard;
 
 import com.github.allisson95.algashop.billing.domain.model.IdGenerator;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,8 +15,10 @@ import static java.util.Objects.requireNonNull;
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Entity
 public class CreditCard {
 
+    @Id
     private UUID id;
 
     private Instant createdAt;

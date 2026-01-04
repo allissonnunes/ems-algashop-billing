@@ -1,5 +1,6 @@
 package com.github.allisson95.algashop.billing.domain.model.invoice;
 
+import jakarta.persistence.Embeddable;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -11,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 public class LineItem {
 
     private Integer number;

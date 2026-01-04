@@ -1,5 +1,7 @@
 package com.github.allisson95.algashop.billing.domain.model.invoice;
 
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
 import lombok.*;
 
 import static com.github.allisson95.algashop.billing.domain.model.Strings.requireNonBlank;
@@ -10,6 +12,7 @@ import static java.util.Objects.requireNonNull;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Embeddable
 public class Payer {
 
     private String fullName;
@@ -20,6 +23,7 @@ public class Payer {
 
     private String phone;
 
+    @Embedded
     private Address address;
 
     @Builder
