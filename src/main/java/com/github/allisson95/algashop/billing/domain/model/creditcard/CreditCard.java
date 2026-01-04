@@ -1,9 +1,7 @@
 package com.github.allisson95.algashop.billing.domain.model.creditcard;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.github.allisson95.algashop.billing.domain.model.IdGenerator;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -11,6 +9,7 @@ import java.util.UUID;
 @Getter
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreditCard {
 
     private UUID id;
@@ -29,5 +28,23 @@ public class CreditCard {
 
     @Setter(AccessLevel.PUBLIC)
     private String gatewayCode;
+
+    public static CreditCard brandNew(
+            final UUID customerId,
+            final String lastNumbers,
+            final String brand,
+            final Integer expirationMonth,
+            final Integer expirationYear,
+            final String gatewayCreditCardCode) {
+        return new CreditCard(
+                IdGenerator.generateTimeBasedUUID(),
+                Instant.now(),
+                customerId,
+                lastNumbers,
+                brand,
+                expirationMonth,
+                expirationYear,
+                gatewayCreditCardCode);
+    }
 
 }

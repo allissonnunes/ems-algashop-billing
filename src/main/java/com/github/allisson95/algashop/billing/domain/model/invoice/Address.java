@@ -7,6 +7,7 @@ import lombok.*;
 @Setter(AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class Address {
 
     private String street;
