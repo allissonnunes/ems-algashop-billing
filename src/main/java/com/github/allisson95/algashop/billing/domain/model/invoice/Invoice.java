@@ -1,15 +1,13 @@
 package com.github.allisson95.algashop.billing.domain.model.invoice;
 
+import com.github.allisson95.algashop.billing.domain.model.DomainException;
 import com.github.allisson95.algashop.billing.domain.model.IdGenerator;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
@@ -65,20 +63,47 @@ public class Invoice {
     }
 
     public void markAsPaid() {
-
+        if (!this.isUnpaid()) {
+            throw new DomainException("Invoice %s with status %s cannot be marked as paid".formatted(this.id, this.status.toString().toLowerCase(Locale.ROOT)));
+        }
+        this.setPaidAt(Instant.now());
+        this.setStatus(InvoiceStatus.PAID);
     }
 
     public void cancel(final String cancellationReason) {
-
+        if (this.isCanceled()) {
+            throw new DomainException("Invoice %s is already canceled".formatted(this.id));
+        }
+        this.setCancellationReason(cancellationReason);
+        this.setCanceledAt(Instant.now());
+        this.setStatus(InvoiceStatus.CANCELED);
     }
 
     public void assignPaymentGatewayCode(final String code) {
-
+        if (!this.isUnpaid()) {
+            throw new DomainException("Invoice %s with status %s cannot be edited".formatted(this.id, this.status.toString().toLowerCase(Locale.ROOT)));
+        }
+        this.getPaymentSettings().assignGatewayCode(code);
     }
 
     public void changePaymentSettings(final PaymentMethod paymentMethod, final UUID creditCardId) {
+        if (!this.isUnpaid()) {
+            throw new DomainException("Invoice %s with status %s cannot be edited".formatted(this.id, this.status.toString().toLowerCase(Locale.ROOT)));
+        }
         final var paymentSettings = PaymentSettings.brandNew(paymentMethod, creditCardId);
         this.setPaymentSettings(paymentSettings);
+    }
+
+    public boolean isCanceled() {
+        return InvoiceStatus.CANCELED.equals(this.status);
+    }
+
+    public boolean isUnpaid() {
+        return InvoiceStatus.UNPAID.equals(this.status);
+    }
+
+    public boolean isPaid() {
+        return InvoiceStatus.PAID.equals(this.status);
     }
 
     public Set<LineItem> getItems() {
