@@ -2,9 +2,12 @@ package com.github.allisson95.algashop.billing.domain.model.creditcard;
 
 import com.github.allisson95.algashop.billing.domain.model.IdGenerator;
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.UUID;
+
+import static java.util.Objects.requireNonNull;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
@@ -26,7 +29,6 @@ public class CreditCard {
 
     private Integer expirationYear;
 
-    @Setter(AccessLevel.PUBLIC)
     private String gatewayCode;
 
     public static CreditCard brandNew(
@@ -36,6 +38,14 @@ public class CreditCard {
             final Integer expirationMonth,
             final Integer expirationYear,
             final String gatewayCreditCardCode) {
+        requireNonNull(customerId, "customerId cannot be null");
+        requireNonNull(expirationMonth, "expirationMonth cannot be null");
+        requireNonNull(expirationYear, "expirationYear cannot be null");
+
+        if (StringUtils.isAnyBlank(lastNumbers, brand, gatewayCreditCardCode)) {
+            throw new IllegalArgumentException("credit card fields cannot be blank");
+        }
+
         return new CreditCard(
                 IdGenerator.generateTimeBasedUUID(),
                 Instant.now(),
@@ -45,6 +55,13 @@ public class CreditCard {
                 expirationMonth,
                 expirationYear,
                 gatewayCreditCardCode);
+    }
+
+    public void setGatewayCode(final String gatewayCode) {
+        if (StringUtils.isBlank(gatewayCode)) {
+            throw new IllegalArgumentException("Gateway code cannot be blank");
+        }
+        this.gatewayCode = gatewayCode;
     }
 
 }

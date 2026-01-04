@@ -3,11 +3,15 @@ package com.github.allisson95.algashop.billing.domain.model.invoice;
 import com.github.allisson95.algashop.billing.domain.model.DomainException;
 import com.github.allisson95.algashop.billing.domain.model.IdGenerator;
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.requireNonNull;
 
 @Getter
 @Setter(AccessLevel.PRIVATE)
@@ -42,6 +46,18 @@ public class Invoice {
     private String cancellationReason;
 
     public static Invoice issue(final String orderId, final UUID customerId, final Payer payer, final Set<LineItem> items) {
+        requireNonNull(customerId, "customerId cannot be null");
+        requireNonNull(payer, "payer cannot be null");
+        requireNonNull(items, "items cannot be null");
+
+        if (StringUtils.isBlank(orderId)) {
+            throw new IllegalArgumentException("orderId cannot be blank");
+        }
+
+        if (items.isEmpty()) {
+            throw new IllegalArgumentException("items cannot be empty");
+        }
+
         final BigDecimal totalAmount = items.stream()
                 .map(LineItem::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -82,6 +98,9 @@ public class Invoice {
     public void assignPaymentGatewayCode(final String code) {
         if (!this.isUnpaid()) {
             throw new DomainException("Invoice %s with status %s cannot be edited".formatted(this.id, this.status.toString().toLowerCase(Locale.ROOT)));
+        }
+        if (isNull(this.getPaymentSettings())) {
+            throw new DomainException("Invoice %s has no payment settings assigned".formatted(this.id));
         }
         this.getPaymentSettings().assignGatewayCode(code);
     }
