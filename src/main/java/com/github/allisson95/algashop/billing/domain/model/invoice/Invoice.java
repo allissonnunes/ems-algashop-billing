@@ -5,6 +5,7 @@ import com.github.allisson95.algashop.billing.domain.model.IdGenerator;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -19,7 +20,7 @@ import static java.util.Objects.requireNonNull;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Entity
-public class Invoice {
+public class Invoice extends AbstractAggregateRoot<Invoice> {
 
     @Id
     private UUID id;
@@ -83,7 +84,7 @@ public class Invoice {
                 .map(LineItem::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        return new Invoice(
+        final Invoice invoice = new Invoice(
                 IdGenerator.generateTimeBasedUUID(),
                 orderId,
                 customerId,
@@ -97,6 +98,10 @@ public class Invoice {
                 items,
                 payer,
                 null);
+
+        invoice.registerEvent(new InvoiceIssuedEvent(invoice.getId(), invoice.getCustomerId(), invoice.getOrderId(), invoice.getIssuedAt()));
+
+        return invoice;
     }
 
     public void markAsPaid() {
@@ -105,6 +110,7 @@ public class Invoice {
         }
         this.setPaidAt(Instant.now());
         this.setStatus(InvoiceStatus.PAID);
+        super.registerEvent(new InvoicePaidEvent(this.getId(), this.getCustomerId(), this.getOrderId(), this.getPaidAt()));
     }
 
     public void cancel(final String cancellationReason) {
@@ -114,6 +120,7 @@ public class Invoice {
         this.setCancellationReason(cancellationReason);
         this.setCanceledAt(Instant.now());
         this.setStatus(InvoiceStatus.CANCELED);
+        super.registerEvent(new InvoiceCanceledEvent(this.getId(), this.getCustomerId(), this.getOrderId(), this.getCanceledAt()));
     }
 
     public void assignPaymentGatewayCode(final String code) {
