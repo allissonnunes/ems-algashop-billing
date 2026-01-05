@@ -3,7 +3,9 @@ package com.github.allisson95.algashop.billing.application.invoice.management;
 import com.github.allisson95.algashop.billing.domain.model.creditcard.CreditCardNotFoundException;
 import com.github.allisson95.algashop.billing.domain.model.creditcard.CreditCardRepository;
 import com.github.allisson95.algashop.billing.domain.model.invoice.*;
+import com.github.allisson95.algashop.billing.domain.model.invoice.payment.Payment;
 import com.github.allisson95.algashop.billing.domain.model.invoice.payment.PaymentGatewayService;
+import com.github.allisson95.algashop.billing.domain.model.invoice.payment.PaymentRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,6 +43,26 @@ public class InvoiceManagementApplicationService {
         this.invoiceRepository.saveAndFlush(invoice);
 
         return invoice.getId();
+    }
+
+    @Transactional
+    public void processPayment(final UUID invoiceId) {
+        final Invoice invoice = this.invoiceRepository.findById(invoiceId)
+                .orElseThrow(() -> new InvoiceNotFoundException(invoiceId));
+
+        final PaymentRequest paymentRequest = this.toPaymentRequest(invoice);
+
+        final Payment payment;
+        try {
+            payment = this.paymentGatewayService.capture(paymentRequest);
+        } catch (final Exception e) {
+            final String errorMessage = "Payment capture failed";
+            log.error(errorMessage, e);
+            invoice.cancel(errorMessage);
+            return;
+        }
+
+        invoicingService.assignPayment(invoice, payment);
     }
 
     private void verifyCreditCardId(final UUID creditCardId, final UUID customerId) {
@@ -82,6 +104,16 @@ public class InvoiceManagementApplicationService {
         }
 
         return items;
+    }
+
+    private PaymentRequest toPaymentRequest(final Invoice invoice) {
+        return PaymentRequest.builder()
+                .method(invoice.getPaymentSettings().getMethod())
+                .amount(invoice.getTotalAmount())
+                .invoiceId(invoice.getId())
+                .creditCardId(invoice.getPaymentSettings().getCreditCardId())
+                .payer(invoice.getPayer())
+                .build();
     }
 
 }
