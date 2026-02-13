@@ -3,7 +3,7 @@ package br.dev.allissonnunes.algashop.billing.infrastructure.creditcard.fastpay;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.web.service.registry.ImportHttpServices;
 
-@ImportHttpServices(group = "fastpay", types = { FastpayCreditCardClient.class, FastpayCreditCardTokenizationClient.class })
+@ImportHttpServices(group = "fastpay-public", types = { FastpayCreditCardTokenizationClient.class })
 @TestConfiguration
 class FastpayCreditCardTokenizationClientConfiguration {
 

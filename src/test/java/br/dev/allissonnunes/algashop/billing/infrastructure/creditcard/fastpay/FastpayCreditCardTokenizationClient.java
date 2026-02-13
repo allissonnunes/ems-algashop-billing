@@ -6,14 +6,12 @@ import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 
 @HttpExchange(
-        accept = MediaType.APPLICATION_JSON_VALUE,
-        headers = {
-                "Token=${algashop.integrations.payment.fastpay.public-token}"
-        }
+        value = "/api/v1/public/tokenized-cards",
+        accept = MediaType.APPLICATION_JSON_VALUE
 )
 public interface FastpayCreditCardTokenizationClient {
 
-    @PostExchange(value = "/api/v1/public/tokenized-cards", contentType = MediaType.APPLICATION_JSON_VALUE)
+    @PostExchange(contentType = MediaType.APPLICATION_JSON_VALUE)
     FastpayTokenizedCreditCardModel tokenize(@RequestBody FastpayTokenizationInput input);
 
 }

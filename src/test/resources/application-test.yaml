@@ -16,6 +16,12 @@ spring:
     serviceclient:
       fastpay:
         base-url: ${algashop.integrations.payment.fastpay.host}
+        default-header:
+          Token: ${algashop.integrations.payment.fastpay.private-token}
+      fastpay-public:
+        base-url: ${algashop.integrations.payment.fastpay.host}
+        default-header:
+          Token: ${algashop.integrations.payment.fastpay.public-token}
   jpa:
     hibernate:
       ddl-auto: none
@@ -33,3 +39,7 @@ algashop:
         host: http://localhost:9995
         private-token: SSEewtC6Ps5yJLdB6SJmh1bqJXgRbCdf8ocDj2hU
         public-token: tDBmh0ZiDrmaZ8BVQD7i9UYdcj9KtZUk
+
+logging:
+  level:
+    org.apache.hc.client5.http: debug

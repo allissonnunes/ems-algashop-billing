@@ -10,10 +10,7 @@ import org.springframework.web.service.annotation.PostExchange;
 
 @HttpExchange(
         value = "/api/v1/credit-cards",
-        accept = MediaType.APPLICATION_JSON_VALUE,
-        headers = {
-                "Token=${algashop.integrations.payment.fastpay.private-token}"
-        }
+        accept = MediaType.APPLICATION_JSON_VALUE
 )
 public interface FastpayCreditCardClient {
 
