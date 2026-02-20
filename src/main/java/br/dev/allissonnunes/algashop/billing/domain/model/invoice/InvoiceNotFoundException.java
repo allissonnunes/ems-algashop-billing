@@ -10,4 +10,8 @@ public class InvoiceNotFoundException extends DomainException {
         super("Invoice with ID %s not found".formatted(invoiceId));
     }
 
+    public InvoiceNotFoundException(final String orderId) {
+        super("Invoice with Order ID %s not found".formatted(orderId));
+    }
+
 }
