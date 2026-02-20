@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -90,7 +91,7 @@ public class InvoiceManagementApplicationService {
                 .build();
     }
 
-    private Set<LineItem> convertToLineItems(final Set<LineItemInput> itemsInput) {
+    private Set<LineItem> convertToLineItems(final Collection<LineItemInput> itemsInput) {
         final Set<LineItem> items = new LinkedHashSet<>();
 
         int index = 1;

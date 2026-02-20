@@ -2,7 +2,7 @@ package br.dev.allissonnunes.algashop.billing.application.invoice.management;
 
 import lombok.Builder;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
 
 @Builder
@@ -11,7 +11,7 @@ public record GenerateInvoiceInput(
         UUID customerId,
         PaymentSettingsInput paymentSettings,
         PayerData payer,
-        Set<LineItemInput> items
+        List<LineItemInput> items
 ) {
 
 }
