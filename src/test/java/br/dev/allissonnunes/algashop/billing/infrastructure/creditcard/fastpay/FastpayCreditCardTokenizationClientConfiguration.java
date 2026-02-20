@@ -5,6 +5,6 @@ import org.springframework.web.service.registry.ImportHttpServices;
 
 @ImportHttpServices(group = "fastpay-public", types = { FastpayCreditCardTokenizationClient.class })
 @TestConfiguration
-class FastpayCreditCardTokenizationClientConfiguration {
+public class FastpayCreditCardTokenizationClientConfiguration {
 
 }
