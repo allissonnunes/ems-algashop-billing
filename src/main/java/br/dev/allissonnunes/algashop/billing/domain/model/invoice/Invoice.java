@@ -2,6 +2,7 @@ package br.dev.allissonnunes.algashop.billing.domain.model.invoice;
 
 import br.dev.allissonnunes.algashop.billing.domain.model.DomainException;
 import br.dev.allissonnunes.algashop.billing.domain.model.IdGenerator;
+import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.apache.commons.lang3.StringUtils;
@@ -140,6 +141,14 @@ public class Invoice extends AbstractAggregateRoot<Invoice> {
         final var paymentSettings = PaymentSettings.brandNew(paymentMethod, creditCardId);
         paymentSettings.setInvoice(this);
         this.setPaymentSettings(paymentSettings);
+    }
+
+    public void updatePaymentStatus(final PaymentStatus status) {
+        switch (status) {
+            case FAILED -> this.cancel("Payment failed");
+            case REFUNDED -> this.cancel("Payment refunded");
+            case PAID -> this.markAsPaid();
+        }
     }
 
     public boolean isCanceled() {

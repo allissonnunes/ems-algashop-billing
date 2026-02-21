@@ -32,7 +32,10 @@ public class AlgaShopPaymentProperties {
             @URL
             String host,
             @NotBlank
-            String privateToken
+            String privateToken,
+            @NotBlank
+            @URL
+            String webhookUrl
     ) {
 
     }

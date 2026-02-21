@@ -8,6 +8,7 @@ import br.dev.allissonnunes.algashop.billing.domain.model.invoice.Payer;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.Payment;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.PaymentGatewayService;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.PaymentRequest;
+import br.dev.allissonnunes.algashop.billing.infrastructure.payment.AlgaShopPaymentProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ class FastpayPaymentGatewayService implements PaymentGatewayService {
     private final FastpayPaymentClient paymentClient;
 
     private final CreditCardRepository creditCardRepository;
+
+    private final AlgaShopPaymentProperties algaShopPaymentProperties;
 
     @Override
     public Payment capture(final PaymentRequest request) {
@@ -72,7 +75,8 @@ class FastpayPaymentGatewayService implements PaymentGatewayService {
         builder.addressLine1(address.getStreet() + ", " + address.getNumber());
         builder.addressLine2(address.getComplement());
         builder.zipCode(address.getZipCode());
-        builder.replyToUrl("https://example.com/fastpay/callback");
+        builder.replyToUrl(algaShopPaymentProperties.getFastpay().webhookUrl());
+
         return builder.build();
     }
 
