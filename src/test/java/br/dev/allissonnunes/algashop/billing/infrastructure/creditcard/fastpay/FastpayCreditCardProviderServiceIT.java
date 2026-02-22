@@ -2,8 +2,6 @@ package br.dev.allissonnunes.algashop.billing.infrastructure.creditcard.fastpay;
 
 import br.dev.allissonnunes.algashop.billing.domain.model.creditcard.LimitedCreditCard;
 import br.dev.allissonnunes.algashop.billing.infrastructure.AbstractFastpayIT;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,16 +15,6 @@ class FastpayCreditCardProviderServiceIT extends AbstractFastpayIT {
 
     @Autowired
     private FastpayCreditCardProviderService fastpayCreditCardProviderService;
-
-    @BeforeAll
-    static void setup() {
-        startWireMockServer();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        stopWireMockServer();
-    }
 
     @Test
     void shouldRegisterCreditCard() {

@@ -6,20 +6,21 @@ import br.dev.allissonnunes.algashop.billing.infrastructure.creditcard.fastpay.F
 import br.dev.allissonnunes.algashop.billing.infrastructure.creditcard.fastpay.FastpayCreditCardTokenizationClientConfiguration;
 import br.dev.allissonnunes.algashop.billing.infrastructure.creditcard.fastpay.FastpayTokenizationInput;
 import br.dev.allissonnunes.algashop.billing.infrastructure.creditcard.fastpay.FastpayTokenizedCreditCardModel;
-import com.github.tomakehurst.wiremock.WireMockServer;
-import com.github.tomakehurst.wiremock.common.ClasspathFileSource;
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
-import com.github.tomakehurst.wiremock.extension.responsetemplating.ResponseTemplateTransformer;
-import com.github.tomakehurst.wiremock.extension.responsetemplating.TemplateEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
+import org.wiremock.spring.ConfigureWireMock;
+import org.wiremock.spring.EnableWireMock;
 
 import java.time.Year;
-import java.util.Collections;
 import java.util.UUID;
 
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
-
+@EnableWireMock({
+        @ConfigureWireMock(
+                name = "fastpay",
+                filesUnderClasspath = "wiremock/fastpay",
+                baseUrlProperties = "algashop.integrations.payment.fastpay.host"
+        )
+})
 @Import(FastpayCreditCardTokenizationClientConfiguration.class)
 public abstract class AbstractFastpayIT {
 
@@ -27,36 +28,11 @@ public abstract class AbstractFastpayIT {
 
     protected static final UUID validCustomerId = UUID.randomUUID();
 
-    protected static WireMockServer wireMockServer;
-
     @Autowired
     protected FastpayCreditCardTokenizationClient fastpayCreditCardTokenizationClient;
 
     @Autowired
     protected CreditCardProviderService fastpayCreditCardProviderService;
-
-//    @DynamicPropertySource
-//    static void redisProperties(final DynamicPropertyRegistry registry) {
-//        registry.add("algashop.integrations.payment.fastpay.host", wireMockServer::baseUrl);
-//    }
-
-    protected static void startWireMockServer() {
-        final WireMockConfiguration options = options()
-                .port(8788)
-                .usingFilesUnderDirectory("src/test/resources/wiremock/fastpay")
-                .extensions(new ResponseTemplateTransformer(
-                        TemplateEngine.defaultTemplateEngine(),
-                        true,
-                        new ClasspathFileSource("src/test/resources/wiremock/fastpay"),
-                        Collections.emptyList()
-                ));
-        wireMockServer = new WireMockServer(options);
-        wireMockServer.start();
-    }
-
-    protected static void stopWireMockServer() {
-        wireMockServer.stop();
-    }
 
     protected LimitedCreditCard registerCreditCard() {
         final FastpayTokenizationInput input = FastpayTokenizationInput.builder()

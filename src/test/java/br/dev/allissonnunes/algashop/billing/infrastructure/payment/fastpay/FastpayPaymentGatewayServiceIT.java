@@ -8,8 +8,6 @@ import br.dev.allissonnunes.algashop.billing.domain.model.invoice.PaymentMethod;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.Payment;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.PaymentRequest;
 import br.dev.allissonnunes.algashop.billing.infrastructure.AbstractFastpayIT;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,16 +27,6 @@ class FastpayPaymentGatewayServiceIT extends AbstractFastpayIT {
     private CreditCardRepository creditCardRepository;
 
     private static final UUID validCustomerId = UUID.randomUUID();
-
-    @BeforeAll
-    static void setup() {
-        startWireMockServer();
-    }
-
-    @AfterAll
-    static void tearDown() {
-        stopWireMockServer();
-    }
 
     @Test
     void shouldProcessPaymentWithCreditCard() {
