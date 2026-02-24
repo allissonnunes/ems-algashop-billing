@@ -8,10 +8,14 @@ import br.dev.allissonnunes.algashop.billing.domain.model.invoice.Payer;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.Payment;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.PaymentGatewayService;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.PaymentRequest;
+import br.dev.allissonnunes.algashop.billing.infrastructure.exception.BadGatewayException;
+import br.dev.allissonnunes.algashop.billing.infrastructure.exception.GatewayTimeoutException;
 import br.dev.allissonnunes.algashop.billing.infrastructure.payment.AlgaShopPaymentProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.ResourceAccessException;
 
 import java.util.UUID;
 
@@ -33,8 +37,10 @@ class FastpayPaymentGatewayService implements PaymentGatewayService {
         final FastpayPaymentModel paymentResponse;
         try {
             paymentResponse = paymentClient.capture(input);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final ResourceAccessException e) {
+            throw new GatewayTimeoutException("Fastpay API Timeout", e);
+        } catch (final HttpClientErrorException e) {
+            throw new BadGatewayException("Fastpay API Bad Gateway", e);
         }
 
         return convertToPayment(paymentResponse);
@@ -45,8 +51,10 @@ class FastpayPaymentGatewayService implements PaymentGatewayService {
         final FastpayPaymentModel paymentResponse;
         try {
             paymentResponse = paymentClient.findById(gatewayCode);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (final ResourceAccessException e) {
+            throw new GatewayTimeoutException("Fastpay API Timeout", e);
+        } catch (final HttpClientErrorException e) {
+            throw new BadGatewayException("Fastpay API Bad Gateway", e);
         }
         return convertToPayment(paymentResponse);
     }

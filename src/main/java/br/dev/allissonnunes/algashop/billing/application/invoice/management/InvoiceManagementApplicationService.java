@@ -17,8 +17,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static java.util.Objects.nonNull;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -34,13 +32,16 @@ public class InvoiceManagementApplicationService {
 
     @Transactional
     public UUID generate(final GenerateInvoiceInput input) {
-        this.verifyCreditCardId(input.paymentSettings().creditCardId(), input.customerId());
+        final PaymentSettingsInput paymentSettings = input.paymentSettings();
+        if (PaymentMethod.CREDIT_CARD == paymentSettings.method()) {
+            this.verifyCreditCard(paymentSettings.creditCardId(), input.customerId());
+        }
 
         final Payer payer = this.convertToPayer(input.payer());
         final Set<LineItem> items = this.convertToLineItems(input.items());
 
         final Invoice invoice = this.invoicingService.issue(input.orderId(), input.customerId(), payer, items);
-        invoice.changePaymentSettings(input.paymentSettings().method(), input.paymentSettings().creditCardId());
+        invoice.changePaymentSettings(paymentSettings.method(), paymentSettings.creditCardId());
 
         this.invoiceRepository.saveAndFlush(invoice);
 
@@ -77,8 +78,8 @@ public class InvoiceManagementApplicationService {
         invoiceRepository.saveAndFlush(invoice);
     }
 
-    private void verifyCreditCardId(final UUID creditCardId, final UUID customerId) {
-        if (nonNull(creditCardId) && !this.creditCardRepository.existsByIdAndCustomerId(creditCardId, customerId)) {
+    private void verifyCreditCard(final UUID creditCardId, final UUID customerId) {
+        if (!this.creditCardRepository.existsByIdAndCustomerId(creditCardId, customerId)) {
             throw new CreditCardNotFoundException(creditCardId);
         }
     }

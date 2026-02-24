@@ -3,10 +3,15 @@ package br.dev.allissonnunes.algashop.billing.application.invoice.management;
 import br.dev.allissonnunes.algashop.billing.domain.model.creditcard.CreditCardRepository;
 import br.dev.allissonnunes.algashop.billing.domain.model.creditcard.CreditCardTestDataBuilder;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.*;
+import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.Payment;
+import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.PaymentGatewayService;
+import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.PaymentRequest;
+import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.PaymentStatus;
 import br.dev.allissonnunes.algashop.billing.infrastructure.listener.InvoiceEventListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +20,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
@@ -26,8 +32,11 @@ class InvoiceManagementApplicationServiceIT {
     @MockitoSpyBean
     private InvoicingService invoicingService;
 
+    @MockitoBean
+    private PaymentGatewayService paymentGatewayService;
+
     @Autowired
-    private InvoiceRepository repository;
+    private InvoiceRepository invoiceRepository;
 
     @Autowired
     private CreditCardRepository creditCardRepository;
@@ -50,7 +59,7 @@ class InvoiceManagementApplicationServiceIT {
                 .build();
         final var invoiceId = service.generate(input);
 
-        final var invoice = repository.findById(invoiceId).orElseThrow();
+        final var invoice = invoiceRepository.findById(invoiceId).orElseThrow();
 
         assertThat(invoice.getStatus()).isEqualTo(InvoiceStatus.UNPAID);
         assertThat(invoice.getOrderId()).isEqualTo(input.orderId());
@@ -69,12 +78,40 @@ class InvoiceManagementApplicationServiceIT {
                 .build();
         final var invoiceId = service.generate(input);
 
-        final var invoice = repository.findById(invoiceId).orElseThrow();
+        final var invoice = invoiceRepository.findById(invoiceId).orElseThrow();
 
         assertThat(invoice.getStatus()).isEqualTo(InvoiceStatus.UNPAID);
         assertThat(invoice.getOrderId()).isEqualTo(input.orderId());
 
         verify(invoicingService).issue(any(), any(), any(), any());
+    }
+
+    @Test
+    public void shouldProcessInvoicePaymentAndCancelInvoice() {
+        Invoice invoice = InvoiceTestDataBuilder.anInvoice().build();
+        invoice.changePaymentSettings(PaymentMethod.GATEWAY_BALANCE, null);
+        invoiceRepository.saveAndFlush(invoice);
+
+        Payment payment = Payment.builder()
+                .gatewayCode("12345")
+                .invoiceId(invoice.getId())
+                .method(invoice.getPaymentSettings().getMethod())
+                .status(PaymentStatus.FAILED)
+                .build();
+
+        when(paymentGatewayService.capture(any(PaymentRequest.class)))
+                .thenReturn(payment);
+
+        service.processPayment(invoice.getId());
+
+        Invoice paidInvoice = invoiceRepository.findById(invoice.getId()).orElseThrow();
+
+        assertThat(paidInvoice.isCanceled()).isTrue();
+
+        verify(paymentGatewayService).capture(any(PaymentRequest.class));
+        verify(invoicingService).assignPayment(any(Invoice.class), any(Payment.class));
+
+        verify(invoiceEventListener).listen(any(InvoiceCanceledEvent.class));
     }
 
 }

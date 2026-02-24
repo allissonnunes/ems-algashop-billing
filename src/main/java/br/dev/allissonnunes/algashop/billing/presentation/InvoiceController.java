@@ -4,6 +4,7 @@ import br.dev.allissonnunes.algashop.billing.application.invoice.management.Gene
 import br.dev.allissonnunes.algashop.billing.application.invoice.management.InvoiceManagementApplicationService;
 import br.dev.allissonnunes.algashop.billing.application.invoice.query.InvoiceOutput;
 import br.dev.allissonnunes.algashop.billing.application.invoice.query.InvoiceQueryService;
+import br.dev.allissonnunes.algashop.billing.domain.model.creditcard.CreditCardNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,12 @@ class InvoiceController {
                 .items(request.items())
                 .build();
 
-        final UUID generatedInvoiceId = invoiceManagementApplicationService.generate(input);
+        final UUID generatedInvoiceId;
+        try {
+            generatedInvoiceId = invoiceManagementApplicationService.generate(input);
+        } catch (final CreditCardNotFoundException e) {
+            throw new UnprocessableContentException(e.getMessage(), e);
+        }
 
         try {
             invoiceManagementApplicationService.processPayment(generatedInvoiceId);
