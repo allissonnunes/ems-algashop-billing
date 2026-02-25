@@ -1,37 +1,14 @@
-server:
-  port: 8082
-
 spring:
-  application:
-    name: billing
-  datasource:
-    url: jdbc:postgresql://localhost:5432/billing
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-  http:
-    clients:
-      imperative:
-        factory: http_components
-    serviceclient:
-      fastpay:
-        base-url: ${algashop.integrations.payment.fastpay.host}
-        default-header:
-          Token: ${algashop.integrations.payment.fastpay.private-token}
-  jpa:
-    hibernate:
-      ddl-auto: none
-    open-in-view: false
-    show-sql: false
-  web:
-    locale-resolver: fixed
-    locale: en_US
-
-algashop:
-  integrations:
-    payment:
-      provider: FASTPAY
-      fastpay:
-        host: http://localhost:9995
-        private-token: SSEewtC6Ps5yJLdB6SJmh1bqJXgRbCdf8ocDj2hU
-        webhook-url: http://host.docker.internal:8082/api/v1/webhooks/fastpay
+  profiles:
+    active: development
+    group:
+      development:
+        - base
+        - development-env
+      docker:
+        - base
+        - development-env
+        - docker-env
+      production:
+        - base
+        - production-env

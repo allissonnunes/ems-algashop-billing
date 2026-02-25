@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://algashop-postgres:5432/billing
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  http:
+    serviceclient:
+      fastpay:
+        base-url: ${algashop.integrations.payment.fastpay.host}
+        default-header:
+          Token: ${algashop.integrations.payment.fastpay.private-token}
+
+algashop:
+  integrations:
+    payment:
+      provider: FASTPAY
+      fastpay:
+        host: http://fastpay:9995
+        private-token: SSEewtC6Ps5yJLdB6SJmh1bqJXgRbCdf8ocDj2hU
+        webhook-url: http://host.docker.internal:8082/api/v1/webhooks/fastpay

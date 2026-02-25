@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: billing
+  flyway:
+    enabled: false
+  http:
+    clients:
+      imperative:
+        factory: http_components
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    show-sql: false
+  web:
+    locale-resolver: fixed
+    locale: en_US
+
+algashop:
+  integrations:
+    payment:
+      provider: FASTPAY
