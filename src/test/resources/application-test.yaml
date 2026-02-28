@@ -4,11 +4,6 @@ server:
 spring:
   application:
     name: billing-test
-  datasource:
-    url: jdbc:postgresql://localhost:5432/billing_test
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
   http:
     clients:
       imperative:

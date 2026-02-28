@@ -1,19 +1,16 @@
 package br.dev.allissonnunes.algashop.billing.application.invoice.query;
 
+import br.dev.allissonnunes.algashop.billing.application.AbstractApplicationIT;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.Invoice;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.InvoiceRepository;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.InvoiceTestDataBuilder;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.PaymentMethod;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@Transactional
-class InvoiceQueryServiceIT {
+class InvoiceQueryServiceIT extends AbstractApplicationIT {
 
     @Autowired
     private InvoiceQueryService invoiceQueryService;

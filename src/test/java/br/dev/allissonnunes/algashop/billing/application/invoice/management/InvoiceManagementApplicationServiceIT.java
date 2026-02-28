@@ -1,5 +1,6 @@
 package br.dev.allissonnunes.algashop.billing.application.invoice.management;
 
+import br.dev.allissonnunes.algashop.billing.application.AbstractApplicationIT;
 import br.dev.allissonnunes.algashop.billing.domain.model.creditcard.CreditCardRepository;
 import br.dev.allissonnunes.algashop.billing.domain.model.creditcard.CreditCardTestDataBuilder;
 import br.dev.allissonnunes.algashop.billing.domain.model.invoice.*;
@@ -10,10 +11,8 @@ import br.dev.allissonnunes.algashop.billing.domain.model.invoice.payment.Paymen
 import br.dev.allissonnunes.algashop.billing.infrastructure.listener.InvoiceEventListener;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -22,9 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Transactional
-class InvoiceManagementApplicationServiceIT {
+class InvoiceManagementApplicationServiceIT extends AbstractApplicationIT {
 
     @MockitoSpyBean
     private InvoiceEventListener invoiceEventListener;
