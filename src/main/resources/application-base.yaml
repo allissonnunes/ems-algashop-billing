@@ -18,6 +18,9 @@ management:
         include:
           - health
           - info
+#  health:
+#    circuitbreakers:
+#      enabled: true
 
 spring:
   application:
@@ -50,13 +53,13 @@ resilience4j:
   circuitbreaker:
     instances:
       fastpayCB:
-        register-health-indicator: true
-        sliding-window-type: time_based
-        sliding-window-size: 10
-        failure-rate-threshold: 50
-        minimum-number-of-calls: 5
-        permitted-number-of-calls-in-half-open-state: 3
-        ignore-exceptions:
+        registerHealthIndicator: true
+        slidingWindowType: time_based
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        ignoreExceptions:
           - br.dev.allissonnunes.algashop.billing.infrastructure.exception.BadGatewayException.ClientErrorException
   timelimiter:
     instances:
@@ -65,10 +68,10 @@ resilience4j:
   retry:
     instances:
       fastpayRetry:
-        max-attempts: 3
-        enable-exponential-backoff: true
-        exponential-backoff-multiplier: 2.0
-        wait-duration: 3s
-        retry-exceptions:
+        maxAttempts: 3
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2.0
+        waitDuration: 3s
+        retryExceptions:
           - br.dev.allissonnunes.algashop.billing.infrastructure.exception.BadGatewayException.ServerErrorException
           - br.dev.allissonnunes.algashop.billing.infrastructure.exception.GatewayTimeoutException
