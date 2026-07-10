@@ -5,6 +5,7 @@ import br.dev.allissonnunes.algashop.billing.application.invoice.management.Invo
 import br.dev.allissonnunes.algashop.billing.application.invoice.query.InvoiceOutput;
 import br.dev.allissonnunes.algashop.billing.application.invoice.query.InvoiceQueryService;
 import br.dev.allissonnunes.algashop.billing.domain.model.creditcard.CreditCardNotFoundException;
+import br.dev.allissonnunes.algashop.billing.infrastructure.security.SecurityAnnotations;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +26,13 @@ class InvoiceController {
 
     private final InvoiceQueryService invoiceQueryService;
 
+    @SecurityAnnotations.CanReadInvoices
     @GetMapping
     public ResponseEntity<InvoiceOutput> findByOrderId(@PathVariable final String orderId) {
         return ResponseEntity.ok(invoiceQueryService.findByOrderId(orderId));
     }
 
+    @SecurityAnnotations.CanWriteInvoices
     @PostMapping
     public ResponseEntity<InvoiceOutput> generate(@PathVariable final String orderId,
                                                   @RequestBody final @Valid GenerateInvoiceRequest request) {

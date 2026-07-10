@@ -4,6 +4,7 @@ import br.dev.allissonnunes.algashop.billing.application.creditcard.management.C
 import br.dev.allissonnunes.algashop.billing.application.creditcard.management.TokenizedCreditCardInput;
 import br.dev.allissonnunes.algashop.billing.application.creditcard.query.CreditCardOutput;
 import br.dev.allissonnunes.algashop.billing.application.creditcard.query.CreditCardQueryService;
+import br.dev.allissonnunes.algashop.billing.infrastructure.security.SecurityAnnotations;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +24,7 @@ class CreditCardController {
 
     private final CreditCardQueryService creditCardQueryService;
 
+    @SecurityAnnotations.CanWriteCreditCards
     @PostMapping
     public ResponseEntity<CreditCardOutput> register(@PathVariable final UUID customerId,
                                                      @RequestBody final @Valid TokenizedCreditCardRequest request) {
@@ -40,11 +42,13 @@ class CreditCardController {
         return ResponseEntity.created(location).body(creditCardOutput);
     }
 
+    @SecurityAnnotations.CanReadCreditCards
     @GetMapping
     public ResponseEntity<List<CreditCardOutput>> findAllByCustomer(@PathVariable final UUID customerId) {
         return ResponseEntity.ok(creditCardQueryService.findByCustomer(customerId));
     }
 
+    @SecurityAnnotations.CanReadCreditCards
     @GetMapping("/{creditCardId}")
     public ResponseEntity<CreditCardOutput> findOne(@PathVariable final UUID customerId,
                                                     @PathVariable final UUID creditCardId) {
@@ -52,6 +56,7 @@ class CreditCardController {
         return ResponseEntity.ok(creditCardOutput);
     }
 
+    @SecurityAnnotations.CanWriteCreditCards
     @DeleteMapping("/{creditCardId}")
     public ResponseEntity<Void> delete(@PathVariable final UUID customerId,
                                        @PathVariable final UUID creditCardId) {

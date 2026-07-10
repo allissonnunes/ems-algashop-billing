@@ -16,6 +16,11 @@ spring:
         base-url: ${algashop.integrations.payment.fastpay.host}
         default-header:
           Token: ${algashop.integrations.payment.fastpay.private-token}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8081
 
 algashop:
   integrations:
